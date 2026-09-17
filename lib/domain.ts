@@ -48,4 +48,11 @@ export function getSessionForUser(user: AuthUser, sessionId: number) {
   return row;
 }
 
+// Owner-scoped lookup for child actions (chat). Admins and other parents receive a non-leaking 404.
+export function getOwnedSessionForUser(user: AuthUser, sessionId: number) {
+  const row = getDatabase().prepare("SELECT s.id,s.child_id AS childId,s.started_at AS startedAt,s.ended_at AS endedAt FROM sessions s JOIN children c ON c.id=s.child_id WHERE s.id=? AND c.parent_id=?").get(sessionId, user.id) as { id: number; childId: number; startedAt: string; endedAt: string | null } | undefined;
+  if (!row) throw new ApiError(404, "Session not found.");
+  return row;
+}
+
 export function parseId(value: string) { return integer(value, "id"); }

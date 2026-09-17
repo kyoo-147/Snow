@@ -5,7 +5,7 @@ import { hashPassword } from "./password";
 
 let database: DatabaseSync | undefined;
 
-const schema = `
+const schemaV1 = `
 CREATE TABLE IF NOT EXISTS migrations (version INTEGER PRIMARY KEY, applied_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP);
 CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY, email TEXT NOT NULL UNIQUE COLLATE NOCASE, name TEXT NOT NULL, role TEXT NOT NULL CHECK(role IN ('parent','admin')), password_hash TEXT NOT NULL, created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP);
 CREATE TABLE IF NOT EXISTS children (id INTEGER PRIMARY KEY, parent_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE, display_name TEXT NOT NULL, date_of_birth TEXT, support_needs TEXT NOT NULL DEFAULT '', created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP);
@@ -24,6 +24,20 @@ CREATE INDEX IF NOT EXISTS idx_sessions_child ON sessions(child_id);
 CREATE INDEX IF NOT EXISTS idx_messages_session ON messages(session_id);
 CREATE INDEX IF NOT EXISTS idx_safety_child ON safety_events(child_id);
 `;
+
+const schemaV2 = `
+ALTER TABLE emotion_events ADD COLUMN note TEXT;
+CREATE TABLE IF NOT EXISTS routine_step_progress (id INTEGER PRIMARY KEY, child_id INTEGER NOT NULL REFERENCES children(id) ON DELETE CASCADE, routine_id INTEGER NOT NULL REFERENCES routines(id) ON DELETE CASCADE, step_id INTEGER NOT NULL REFERENCES routine_steps(id) ON DELETE CASCADE, completed_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP, UNIQUE(child_id, step_id));
+CREATE INDEX IF NOT EXISTS idx_routine_step_progress_child ON routine_step_progress(child_id);
+CREATE INDEX IF NOT EXISTS idx_routine_step_progress_routine ON routine_step_progress(child_id, routine_id);
+DELETE FROM safety_events WHERE session_id IS NOT NULL AND id NOT IN (SELECT min(id) FROM safety_events WHERE session_id IS NOT NULL GROUP BY session_id, source, content);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_safety_events_dedup ON safety_events(session_id, source, content) WHERE session_id IS NOT NULL;
+`;
+
+const migrations: Array<{ version: number; apply: (db: DatabaseSync) => void }> = [
+  { version: 1, apply: (db) => db.exec(schemaV1) },
+  { version: 2, apply: (db) => db.exec(schemaV2) },
+];
 
 export function openDatabase(path = process.env.AGENTKID_DB_PATH ?? resolve(process.cwd(), ".data", "agentkid.db")) {
   mkdirSync(dirname(path), { recursive: true });
@@ -57,8 +71,14 @@ export function transaction<T>(db: DatabaseSync, operation: () => T) {
 }
 
 function migrate(db: DatabaseSync) {
-  db.exec(schema);
-  db.prepare("INSERT OR IGNORE INTO migrations(version) VALUES (1)").run();
+  db.exec("CREATE TABLE IF NOT EXISTS migrations (version INTEGER PRIMARY KEY, applied_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP)");
+  const applied = new Set((db.prepare("SELECT version FROM migrations").all() as Array<{ version: number }>).map((row) => row.version));
+  const insert = db.prepare("INSERT INTO migrations(version) VALUES (?)");
+  for (const migration of migrations) {
+    if (applied.has(migration.version)) continue;
+    migration.apply(db);
+    insert.run(migration.version);
+  }
 }
 
 function seed(db: DatabaseSync) {

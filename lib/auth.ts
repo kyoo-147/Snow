@@ -44,10 +44,22 @@ export async function requireUser(role?: Role) {
   return user;
 }
 
+function childRecord(childId: number) {
+  return getDatabase().prepare("SELECT id,parent_id AS parentId,display_name AS displayName,date_of_birth AS dateOfBirth,support_needs AS supportNeeds,created_at AS createdAt FROM children WHERE id = ?").get(childId) as Record<string, unknown> | undefined;
+}
+
 export function assertChildAccess(user: AuthUser, childId: number) {
-  const child = getDatabase().prepare("SELECT id,parent_id AS parentId,display_name AS displayName,date_of_birth AS dateOfBirth,support_needs AS supportNeeds,created_at AS createdAt FROM children WHERE id = ?").get(childId) as Record<string, unknown> | undefined;
+  const child = childRecord(childId);
   if (!child) throw new ApiError(404, "Child not found.");
   if (user.role !== "admin" && child.parentId !== user.id) throw new ApiError(404, "Child not found.");
+  return child;
+}
+
+// Stricter than assertChildAccess: only the owning parent may act on child-derived records.
+// Admins are intentionally rejected (fail closed, 404) so they can never act as an arbitrary child.
+export function assertChildOwnership(user: AuthUser, childId: number) {
+  const child = childRecord(childId);
+  if (!child || user.role !== "parent" || child.parentId !== user.id) throw new ApiError(404, "Child not found.");
   return child;
 }
 
