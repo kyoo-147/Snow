@@ -1,2 +1,95 @@
-import { AppShell } from "@/components/app-shell";
-export default function Kid(){return <AppShell><div className="heading"><p className="eyebrow">Kid space</p><h1>Ready for a small step?</h1><p>This placeholder is intentionally simple. The session and child-safe chat APIs are ready for the dedicated UI lane.</p></div><section className="card focus"><h2>Today’s starting point</h2><p>Take a breath, choose one activity, and ask for help whenever you need it.</p><button className="button">Start a session</button></section></AppShell>;}
+"use client";
+
+import Link from "next/link";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { fetchJson } from "@/components/api-client";
+
+type Child = {
+  id: number;
+  displayName: string;
+};
+
+export default function KidRootSelectorPage() {
+  const router = useRouter();
+  const [children, setChildren] = useState<Child[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchJson<Child[]>("/api/children")
+      .then((data) => {
+        setChildren(data);
+        if (data.length === 1) {
+          router.replace(`/kid/${data[0].id}`);
+        } else {
+          setLoading(false);
+        }
+      })
+      .catch(() => {
+        setLoading(false);
+      });
+  }, [router]);
+
+  return (
+    <div
+      style={{
+        minHeight: "100vh",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: "24px",
+        background: "var(--soft)",
+      }}
+    >
+      <div
+        className="card"
+        style={{
+          width: "100%",
+          maxWidth: "520px",
+          textAlign: "center",
+          border: "3px solid var(--ink)",
+          padding: "36px 24px",
+          display: "flex",
+          flexDirection: "column",
+          gap: "20px",
+        }}
+      >
+        <span style={{ fontSize: "3rem" }}>✨</span>
+        <h1 style={{ fontSize: "2rem" }}>Who is learning today?</h1>
+        <p className="text-muted" style={{ fontSize: "1.1rem" }}>
+          Choose your profile to enter your calm learning space.
+        </p>
+
+        {loading ? (
+          <p>Loading profiles…</p>
+        ) : children.length === 0 ? (
+          <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+            <p>No child profiles found.</p>
+            <Link href="/parent/children" className="btn btn-kid btn-primary">
+              Set Up Child Profile
+            </Link>
+          </div>
+        ) : (
+          <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
+            {children.map((child) => (
+              <Link
+                key={child.id}
+                href={`/kid/${child.id}`}
+                className="btn btn-kid btn-lime"
+                style={{ fontSize: "1.3rem" }}
+              >
+                {child.displayName} →
+              </Link>
+            ))}
+          </div>
+        )}
+
+        <div style={{ marginTop: "12px" }}>
+          <Link href="/parent" className="btn btn-sm">
+            ← Return to Parent Workspace
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
+}

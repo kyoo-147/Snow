@@ -1,4 +1,121 @@
 "use client";
+
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
-export function LoginForm(){const router=useRouter();const [error,setError]=useState("");const [busy,setBusy]=useState(false);async function submit(event:FormEvent<HTMLFormElement>){event.preventDefault();setBusy(true);setError("");const form=new FormData(event.currentTarget);const response=await fetch("/api/auth/login",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({email:form.get("email"),password:form.get("password")})});setBusy(false);if(!response.ok){setError("Email or password is incorrect.");return;}router.push("/dashboard");router.refresh();}return <form onSubmit={submit}><label>Email<input name="email" type="email" defaultValue="parent@agentkid.local" required/></label><label>Password<input name="password" type="password" defaultValue="Parent123!" required/></label>{error&&<p className="error" role="alert">{error}</p>}<button className="button" disabled={busy}>{busy?"Signing in…":"Sign in"}</button></form>;}
+
+export function LoginForm() {
+  const router = useRouter();
+  const [email, setEmail] = useState("parent@agentkid.local");
+  const [password, setPassword] = useState("Parent123!");
+  const [error, setError] = useState("");
+  const [busy, setBusy] = useState(false);
+
+  async function performLogin(loginEmail: string, loginPass: string) {
+    setBusy(true);
+    setError("");
+    try {
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ email: loginEmail, password: loginPass }),
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        setError(data?.error?.message || "Invalid email or password.");
+        setBusy(false);
+        return;
+      }
+      if (data?.data?.role === "admin") {
+        router.push("/admin");
+      } else {
+        router.push("/parent");
+      }
+      router.refresh();
+    } catch {
+      setError("Network error. Please try again.");
+      setBusy(false);
+    }
+  }
+
+  async function submit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    await performLogin(email, password);
+  }
+
+  function setParentDemo() {
+    setEmail("parent@agentkid.local");
+    setPassword("Parent123!");
+  }
+
+  function setAdminDemo() {
+    setEmail("admin@agentkid.local");
+    setPassword("Admin123!");
+  }
+
+  return (
+    <form onSubmit={submit} aria-label="Sign in form">
+      <div style={{ display: "flex", gap: "8px", marginBottom: "16px" }}>
+        <button
+          type="button"
+          onClick={setParentDemo}
+          className="btn btn-sm btn-mint"
+          style={{ flex: 1 }}
+        >
+          Fill Demo Parent
+        </button>
+        <button
+          type="button"
+          onClick={setAdminDemo}
+          className="btn btn-sm btn-lilac"
+          style={{ flex: 1 }}
+        >
+          Fill Demo Admin
+        </button>
+      </div>
+
+      <div className="form-group">
+        <label className="form-label" htmlFor="email">
+          Email address
+        </label>
+        <input
+          id="email"
+          name="email"
+          type="email"
+          className="input"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+          autoComplete="email"
+        />
+      </div>
+
+      <div className="form-group">
+        <label className="form-label" htmlFor="password">
+          Password
+        </label>
+        <input
+          id="password"
+          name="password"
+          type="password"
+          className="input"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+          autoComplete="current-password"
+        />
+      </div>
+
+      <div aria-live="polite" aria-atomic="true">
+        {error && (
+          <div className="feedback-banner feedback-error" role="alert">
+            {error}
+          </div>
+        )}
+      </div>
+
+      <button type="submit" className="btn btn-primary" style={{ width: "100%" }} disabled={busy}>
+        {busy ? "Signing in…" : "Sign in to AgentKid"}
+      </button>
+    </form>
+  );
+}
