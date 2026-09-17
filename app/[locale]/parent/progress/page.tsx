@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { ParentShell } from "@/components/parent-shell";
+import { useTranslations } from "next-intl";
 import { fetchJson } from "@/components/api-client";
 
 type Child = {
@@ -32,6 +33,7 @@ type ProgressData = {
 };
 
 function ProgressContent() {
+  const t = useTranslations("parent.progress");
   const searchParams = useSearchParams();
   const queryChildId = searchParams.get("childId");
 
@@ -48,13 +50,13 @@ function ProgressContent() {
       const data = await fetchJson<ProgressData>(`/api/children/${childId}/progress`);
       setProgress(data);
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : "Failed to load progress records.";
+      const msg = err instanceof Error ? err.message : t("failedLoadProgress");
       setError(msg);
       setProgress(null);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     fetchJson<Child[]>("/api/children")
@@ -71,10 +73,10 @@ function ProgressContent() {
         }
       })
       .catch((err) => {
-        setError(err.message || "Failed to load children.");
+        setError(err.message || t("failedLoadChildren"));
         setLoading(false);
       });
-  }, [queryChildId, loadProgress]);
+  }, [queryChildId, loadProgress, t]);
 
   function handleSelectChild(id: number) {
     setSelectedChildId(id);
@@ -95,7 +97,7 @@ function ProgressContent() {
 
       {children.length > 1 && (
         <div style={{ display: "flex", gap: "10px", marginBottom: "28px", alignItems: "center", flexWrap: "wrap" }}>
-          <span style={{ fontWeight: 700, fontSize: "0.9rem" }}>Select Child:</span>
+          <span style={{ fontWeight: 700, fontSize: "0.9rem" }}>{t("selectChild")}</span>
           {children.map((c) => (
             <button
               key={c.id}
@@ -111,29 +113,29 @@ function ProgressContent() {
 
       {loading ? (
         <div className="empty-box">
-          <p>Loading real progress data for {selectedChild?.displayName || "child"}…</p>
+          <p>{t("loadingProgress", { name: selectedChild?.displayName || t("childFallback") })}</p>
         </div>
       ) : children.length === 0 ? (
         <div className="empty-box">
-          <h3>No children profiles found</h3>
-          <p className="text-muted">Add a child profile first to track progress records.</p>
+          <h3>{t("noChildrenProfiles")}</h3>
+          <p className="text-muted">{t("noChildrenDesc")}</p>
         </div>
       ) : !progress ? (
         <div className="empty-box">
-          <p>No progress data could be retrieved.</p>
+          <p>{t("noProgressData")}</p>
         </div>
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: "36px" }}>
           {/* Routines section */}
           <section>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
-              <h2>Routines Progress</h2>
-              <span className="badge badge-aqua">{progress.routines.length} Tracked</span>
+              <h2>{t("routinesProgress")}</h2>
+              <span className="badge badge-aqua">{t("trackedCount", { count: progress.routines.length })}</span>
             </div>
 
             {progress.routines.length === 0 ? (
               <div className="card card-soft">
-                <p className="text-muted">No routines assigned or available yet.</p>
+                <p className="text-muted">{t("noRoutines")}</p>
               </div>
             ) : (
               <div className="grid-2">
@@ -151,12 +153,12 @@ function ProgressContent() {
                       </div>
 
                       <p style={{ fontSize: "0.95rem" }}>
-                        <strong>Step Progress:</strong> Step {r.currentStep} of {r.totalSteps} steps
+                        <strong>{t("stepProgress")}</strong> {t("stepOf", { current: r.currentStep, total: r.totalSteps })}
                       </p>
 
                       {r.completedAt && (
                         <p style={{ fontSize: "0.85rem", color: "var(--muted)" }}>
-                          Completed on: {new Date(r.completedAt).toLocaleDateString()}
+                          {t("completedOn", { date: new Date(r.completedAt).toLocaleDateString() })}
                         </p>
                       )}
 
@@ -170,7 +172,7 @@ function ProgressContent() {
                           overflow: "hidden",
                           marginTop: "6px",
                         }}
-                        aria-label={`Progress bar: ${r.currentStep} of ${r.totalSteps} steps`}
+                        aria-label={t("progressBarAria", { current: r.currentStep, total: r.totalSteps })}
                       >
                         <div
                           style={{
@@ -191,13 +193,13 @@ function ProgressContent() {
           {/* Lessons section */}
           <section>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
-              <h2>Lessons Progress</h2>
-              <span className="badge badge-lilac">{progress.lessons.length} Tracked</span>
+              <h2>{t("lessonsProgress")}</h2>
+              <span className="badge badge-lilac">{t("trackedCount", { count: progress.lessons.length })}</span>
             </div>
 
             {progress.lessons.length === 0 ? (
               <div className="card card-soft">
-                <p className="text-muted">No lessons available yet.</p>
+                <p className="text-muted">{t("noLessons")}</p>
               </div>
             ) : (
               <div className="grid-2">
@@ -224,13 +226,13 @@ function ProgressContent() {
 
                     {l.score !== null && (
                       <p style={{ fontSize: "0.95rem" }}>
-                        <strong>Score:</strong> {l.score} pts
+                        <strong>{t("scorePrefix")}</strong> {t("scoreSuffix", { score: l.score })}
                       </p>
                     )}
 
                     {l.updatedAt && (
                       <p style={{ fontSize: "0.85rem", color: "var(--muted)" }}>
-                        Last activity: {new Date(l.updatedAt).toLocaleString()}
+                        {t("lastActivity", { date: new Date(l.updatedAt).toLocaleString() })}
                       </p>
                     )}
                   </div>
@@ -245,12 +247,13 @@ function ProgressContent() {
 }
 
 export default function ParentProgressPage() {
+  const t = useTranslations("parent.progress");
   return (
     <ParentShell
-      title="Learning & Routine Progress"
-      description="Real-time, persisted progress on routines and mini-lessons recorded directly from kid activities."
+      title={t("title")}
+      description={t("description")}
     >
-      <Suspense fallback={<div className="empty-box"><p>Loading progress…</p></div>}>
+      <Suspense fallback={<div className="empty-box"><p>{t("loadingFallback")}</p></div>}>
         <ProgressContent />
       </Suspense>
     </ParentShell>

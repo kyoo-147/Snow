@@ -1,6 +1,8 @@
 "use client";
 
-import Link from "next/link";
+import { Link } from "@/i18n/routing";
+import { useTranslations } from "next-intl";
+import { LanguageSwitcher } from "./language-switcher";
 import { useEffect, useState } from "react";
 import { fetchJson } from "./api-client";
 
@@ -21,6 +23,7 @@ export function KidShell({
   children: React.ReactNode;
 }) {
   const [child, setChild] = useState<Child | null>(null);
+  const t = useTranslations("common.kidShell");
 
   useEffect(() => {
     fetchJson<Child>(`/api/children/${childId}`)
@@ -35,12 +38,13 @@ export function KidShell({
           href="/parent"
           className="btn btn-kid"
           style={{ minHeight: "56px", padding: "8px 20px", fontSize: "1.1rem" }}
-          aria-label="Exit Kid Mode and return to Parent space"
+          
         >
-          ← Exit Kid Mode
+          ← {t("switchProfile")}
         </Link>
 
         <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+          <LanguageSwitcher />
           <span
             className="badge badge-mint"
             style={{ fontSize: "1rem", padding: "8px 16px", border: "2px solid var(--ink)" }}
@@ -65,3 +69,4 @@ export function KidShell({
     </div>
   );
 }
+

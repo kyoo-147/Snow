@@ -1,9 +1,10 @@
 "use client";
 
-import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { Link, usePathname, useRouter } from "@/i18n/routing";
 import { useEffect, useState } from "react";
 import { fetchJson } from "./api-client";
+import { useTranslations } from "next-intl";
+import { LanguageSwitcher } from "./language-switcher";
 
 type User = {
   id: number;
@@ -28,6 +29,7 @@ export function ParentShell({
   description?: string;
   actions?: React.ReactNode;
 }) {
+  const t = useTranslations("common.parentShell");
   const pathname = usePathname();
   const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
@@ -60,11 +62,11 @@ export function ParentShell({
   }
 
   const navItems = [
-    { href: "/parent", label: "Overview" },
-    { href: "/parent/children", label: "Children" },
-    { href: "/parent/progress", label: "Progress" },
-    { href: "/parent/alerts", label: "Safety Alerts" },
-    { href: "/parent/memories", label: "Memories" },
+    { href: "/parent", label: t("navOverview") },
+    { href: "/parent/children", label: t("navChildren") },
+    { href: "/parent/progress", label: t("navProgress") },
+    { href: "/parent/alerts", label: t("navAlerts") },
+    { href: "/parent/memories", label: t("navMemories") },
   ];
 
   return (
@@ -75,7 +77,7 @@ export function ParentShell({
             <span className="brand-dot">AK</span>
             <span>AgentKid</span>
           </Link>
-          <nav className="header-nav" aria-label="Parent navigation">
+          <nav className="header-nav">
             {navItems.map((item) => {
               const isActive = pathname === item.href;
               return (
@@ -93,19 +95,20 @@ export function ParentShell({
         </div>
 
         <div className="header-actions">
+          <LanguageSwitcher />
           {kids.length > 0 && (
             <Link
               href={`/kid/${kids[0].id}`}
               className="btn btn-mint btn-sm"
-              title={`Switch to Kid Mode as ${kids[0].displayName}`}
+              title={t("titleKidMode", { name: kids[0].displayName })}
             >
-              Kid Mode ({kids[0].displayName})
+              {t("kidMode")} ({kids[0].displayName})
             </Link>
           )}
 
           {user?.role === "admin" && (
             <Link href="/admin" className="btn btn-sm">
-              Admin Console
+              {t("adminConsole")}
             </Link>
           )}
 
@@ -113,9 +116,9 @@ export function ParentShell({
             onClick={handleLogout}
             disabled={loggingOut}
             className="btn btn-sm"
-            aria-label="Log out"
+            aria-label={t("logOut")}
           >
-            {loggingOut ? "Signing out…" : "Log out"}
+            {loggingOut ? t("signingOut") : t("logOut")}
           </button>
         </div>
       </header>

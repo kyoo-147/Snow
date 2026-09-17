@@ -1,0 +1,58 @@
+{
+  "parentShell": {
+    "navOverview": "Tổng quan",
+    "navChildren": "Trẻ em",
+    "navProgress": "Tiến độ",
+    "navAlerts": "Cảnh báo an toàn",
+    "navMemories": "Ghi nhớ",
+    "kidMode": "Chế độ trẻ em",
+    "adminConsole": "Bảng điều khiển quản trị",
+    "signingOut": "Đang đăng xuất…",
+    "logOut": "Đăng xuất",
+    "titleKidMode": "Chuyển sang Chế độ trẻ em với tư cách {name}"
+  },
+  "adminShell": {
+    "brandText": "Quản trị AgentKid",
+    "navOverview": "Tổng quan",
+    "navLessons": "Bài học",
+    "navRoutines": "Lịch trình",
+    "parentPortal": "Cổng phụ huynh",
+    "signingOut": "Đang đăng xuất…",
+    "logOut": "Đăng xuất"
+  },
+  "kidShell": {
+    "navHome": "Trang chủ",
+    "navChat": "Trò chuyện",
+    "navRoutine": "Lịch trình",
+    "navEmotion": "Cảm xúc",
+    "switchProfile": "Chuyển hồ sơ",
+    "logOut": "Đăng xuất"
+  },
+  "loginForm": {
+    "fillDemoParent": "Điền tài khoản Phụ huynh",
+    "fillDemoAdmin": "Điền tài khoản Quản trị",
+    "emailLabel": "Địa chỉ Email",
+    "passwordLabel": "Mật khẩu",
+    "signingIn": "Đang đăng nhập…",
+    "signInButton": "Đăng nhập vào AgentKid",
+    "errorInvalid": "Email hoặc mật khẩu không hợp lệ.",
+    "errorNetwork": "Lỗi mạng. Vui lòng thử lại."
+  },
+  "appShell": {
+    "navParent": "Phụ huynh",
+    "navKid": "Trẻ em",
+    "navAdmin": "Quản trị",
+    "languageSwitcher": "Ngôn ngữ"
+  },
+  "logoutButton": {
+    "logOut": "Đăng xuất"
+  },
+  "api": {
+    "internalError": "Lỗi máy chủ nội bộ.",
+    "invalidBody": "Nội dung yêu cầu phải là JSON hợp lệ."
+  },
+  "safety": {
+    "fallbackRisk": "Cảm ơn bạn đã nói cho tôi biết. Vui lòng đến gặp người lớn đáng tin cậy ngay bây giờ và nói với họ rằng bạn cần giúp đỡ. Nếu bạn đang gặp nguy hiểm, hãy gọi cho số khẩn cấp địa phương.",
+    "fallbackSafe": "Tôi đang lắng nghe. Hãy thực hiện từng bước một. Bạn cần giúp đỡ về điều gì từ “{input}”?"
+  }
+}

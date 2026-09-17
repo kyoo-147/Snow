@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { ParentShell } from "@/components/parent-shell";
+import { useTranslations } from "next-intl";
 import { fetchJson } from "@/components/api-client";
 
 type Child = {
@@ -19,6 +20,7 @@ type Memory = {
 };
 
 export default function ParentMemoriesPage() {
+  const t = useTranslations("parent.memories");
   const [children, setChildren] = useState<Child[]>([]);
   const [selectedChildId, setSelectedChildId] = useState<number | null>(null);
   const [memories, setMemories] = useState<Memory[]>([]);
@@ -34,13 +36,13 @@ export default function ParentMemoriesPage() {
       const data = await fetchJson<Memory[]>(`/api/children/${childId}/memories`);
       setMemories(data);
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : "Failed to load memories.";
+      const msg = err instanceof Error ? err.message : t("failedLoadMemories");
       setError(msg);
       setMemories([]);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     fetchJson<Child[]>("/api/children")
@@ -54,10 +56,10 @@ export default function ParentMemoriesPage() {
         }
       })
       .catch((err) => {
-        setError(err.message || "Failed to load children.");
+        setError(err.message || t("failedLoadChildren"));
         setLoading(false);
       });
-  }, [loadMemories]);
+  }, [loadMemories, t]);
 
   function handleSelectChild(id: number) {
     setSelectedChildId(id);
@@ -66,7 +68,7 @@ export default function ParentMemoriesPage() {
 
   async function handleDeleteMemory(memoryId: number) {
     if (!selectedChildId) return;
-    if (!confirm("Are you sure you want to delete this memory?")) return;
+    if (!confirm(t("deleteConfirm"))) return;
 
     setDeletingId(memoryId);
     setError("");
@@ -77,9 +79,9 @@ export default function ParentMemoriesPage() {
         method: "DELETE",
       });
       setMemories((prev) => prev.filter((m) => m.id !== memoryId));
-      setStatusMessage("Memory deleted successfully.");
+      setStatusMessage(t("memoryDeleted"));
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : "Failed to delete memory.";
+      const msg = err instanceof Error ? err.message : t("failedDelete");
       setError(msg);
     } finally {
       setDeletingId(null);
@@ -90,8 +92,8 @@ export default function ParentMemoriesPage() {
 
   return (
     <ParentShell
-      title="Child Memories & Preferences"
-      description="Review captured preferences, interests, and milestones curated from conversations and routines."
+      title={t("title")}
+      description={t("description")}
     >
       <div aria-live="polite" aria-atomic="true">
         {error && (
@@ -108,7 +110,7 @@ export default function ParentMemoriesPage() {
 
       {children.length > 1 && (
         <div style={{ display: "flex", gap: "10px", marginBottom: "24px", alignItems: "center", flexWrap: "wrap" }}>
-          <span style={{ fontWeight: 700, fontSize: "0.9rem" }}>Select Child:</span>
+          <span style={{ fontWeight: 700, fontSize: "0.9rem" }}>{t("selectChild")}</span>
           {children.map((c) => (
             <button
               key={c.id}
@@ -124,16 +126,16 @@ export default function ParentMemoriesPage() {
 
       {loading ? (
         <div className="empty-box">
-          <p>Loading memories for {selectedChild?.displayName || "child"}…</p>
+          <p>{t("loadingMemories", { name: selectedChild?.displayName || t("childFallback") })}</p>
         </div>
       ) : children.length === 0 ? (
         <div className="empty-box">
-          <h3>No children profiles found</h3>
-          <p className="text-muted">Add a child profile first to manage memories.</p>
+          <h3>{t("noChildrenProfiles")}</h3>
+          <p className="text-muted">{t("noChildrenDesc")}</p>
         </div>
       ) : memories.length === 0 ? (
         <div className="empty-box">
-          <h3>No memories recorded yet</h3>
+          <h3>{t("noMemories")}</h3>
           <p className="text-muted">
             As {selectedChild?.displayName || "your child"} chats and interacts, key interests and
             preferences will be saved here.

@@ -42,9 +42,9 @@ async function fetchWithLimits(url: string, init: RequestInit, external?: AbortS
 
 export async function chatResponse(input: string, options: { history?: ChatHistoryMessage[]; signal?: AbortSignal } = {}): Promise<ChatResponse> {
   const inputRisk = assessSafety(input);
-  if (!inputRisk.safe) return { content: safeFallback(input, true), provider: "safety-fallback", inputRisk, outputRisk: undefined };
+  if (!inputRisk.safe) return { content: await safeFallback(input, true), provider: "safety-fallback", inputRisk, outputRisk: undefined };
   const key = process.env.OPENAI_API_KEY;
-  if (!key) return { content: safeFallback(input, false), provider: "fallback", inputRisk, outputRisk: undefined };
+  if (!key) return { content: await safeFallback(input, false), provider: "fallback", inputRisk, outputRisk: undefined };
   try {
     const history = (options.history ?? [])
       .slice(-MAX_HISTORY_MESSAGES)
@@ -65,9 +65,10 @@ export async function chatResponse(input: string, options: { history?: ChatHisto
     if (typeof raw !== "string" || !raw.trim()) throw new Error("Provider returned no usable content");
     const content = raw.trim().slice(0, MAX_OUTPUT);
     const outputRisk = assessSafety(content);
-    if (!outputRisk.safe) return { content: safeFallback(input, true), provider: "safety-fallback", inputRisk, outputRisk: { severity: outputRisk.severity, content } };
+    if (!outputRisk.safe) return { content: await safeFallback(input, true), provider: "safety-fallback", inputRisk, outputRisk: { severity: outputRisk.severity, content } };
     return { content, provider: "openai-compatible", inputRisk, outputRisk: undefined };
   } catch {
-    return { content: safeFallback(input, false), provider: "fallback", inputRisk, outputRisk: undefined };
+    return { content: await safeFallback(input, false), provider: "fallback", inputRisk, outputRisk: undefined };
   }
 }
+

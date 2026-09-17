@@ -1,0 +1,58 @@
+{
+    "parentShell":  {
+                        "navOverview":  "Overview",
+                        "navChildren":  "Children",
+                        "navProgress":  "Progress",
+                        "navAlerts":  "Safety Alerts",
+                        "navMemories":  "Memories",
+                        "kidMode":  "Kid Mode",
+                        "adminConsole":  "Admin Console",
+                        "signingOut":  "Signing out…",
+                        "logOut":  "Log out",
+                        "titleKidMode":  "Switch to Kid Mode as {name}"
+                    },
+    "adminShell":  {
+                       "brandText":  "AgentKid Admin",
+                       "navOverview":  "Overview",
+                       "navLessons":  "Lessons",
+                       "navRoutines":  "Routines",
+                       "parentPortal":  "Parent Portal",
+                       "signingOut":  "Signing out�",
+                       "logOut":  "Log out"
+                   },
+    "kidShell":  {
+                     "navHome":  "Home",
+                     "navChat":  "Chat",
+                     "navRoutine":  "Routine",
+                     "navEmotion":  "Emotion",
+                     "switchProfile":  "Switch Profile",
+                     "logOut":  "Log out"
+                 },
+    "loginForm":  {
+                      "fillDemoParent":  "Fill Demo Parent",
+                      "fillDemoAdmin":  "Fill Demo Admin",
+                      "emailLabel":  "Email address",
+                      "passwordLabel":  "Password",
+                      "signingIn":  "Signing in…",
+                      "signInButton":  "Sign in to AgentKid",
+                      "errorInvalid":  "Invalid email or password.",
+                      "errorNetwork":  "Network error. Please try again."
+                  },
+    "appShell":  {
+                     "navParent":  "Parent",
+                     "navKid":  "Kid",
+                     "navAdmin":  "Admin",
+                     "languageSwitcher":  "Language"
+                 },
+    "logoutButton":  {
+                         "logOut":  "Log out"
+                     },
+    "api":  {
+                "internalError":  "Internal server error.",
+                "invalidBody":  "Request body must be valid JSON."
+            },
+    "safety":  {
+                   "fallbackRisk":  "Thank you for telling me. Please go to a trusted adult right now and tell them you need help. If you are in immediate danger, call your local emergency number.",
+                   "fallbackSafe":  "I hear you. Let\u0027s take this one step at a time. What is one small thing about “{input}” you would like help with?"
+               }
+}

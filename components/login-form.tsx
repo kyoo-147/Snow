@@ -1,9 +1,11 @@
 "use client";
 
 import { FormEvent, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter } from "@/i18n/routing";
+import { useTranslations } from "next-intl";
 
 export function LoginForm() {
+  const t = useTranslations("common.loginForm");
   const router = useRouter();
   const [email, setEmail] = useState("parent@agentkid.local");
   const [password, setPassword] = useState("Parent123!");
@@ -21,7 +23,7 @@ export function LoginForm() {
       });
       const data = await response.json();
       if (!response.ok) {
-        setError(data?.error?.message || "Invalid email or password.");
+        setError(data?.error?.message || t("errorInvalid"));
         setBusy(false);
         return;
       }
@@ -32,7 +34,7 @@ export function LoginForm() {
       }
       router.refresh();
     } catch {
-      setError("Network error. Please try again.");
+      setError(t("errorNetwork"));
       setBusy(false);
     }
   }
@@ -61,7 +63,7 @@ export function LoginForm() {
           className="btn btn-sm btn-mint"
           style={{ flex: 1 }}
         >
-          Fill Demo Parent
+          {t("fillDemoParent")}
         </button>
         <button
           type="button"
@@ -69,13 +71,13 @@ export function LoginForm() {
           className="btn btn-sm btn-lilac"
           style={{ flex: 1 }}
         >
-          Fill Demo Admin
+          {t("fillDemoAdmin")}
         </button>
       </div>
 
       <div className="form-group">
         <label className="form-label" htmlFor="email">
-          Email address
+          {t("emailLabel")}
         </label>
         <input
           id="email"
@@ -91,7 +93,7 @@ export function LoginForm() {
 
       <div className="form-group">
         <label className="form-label" htmlFor="password">
-          Password
+          {t("passwordLabel")}
         </label>
         <input
           id="password"
@@ -114,7 +116,7 @@ export function LoginForm() {
       </div>
 
       <button type="submit" className="btn btn-primary" style={{ width: "100%" }} disabled={busy}>
-        {busy ? "Signing in…" : "Sign in to AgentKid"}
+        {busy ? t("signingIn") : t("signInButton")}
       </button>
     </form>
   );

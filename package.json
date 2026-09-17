@@ -2,7 +2,9 @@
   "name": "agentkid",
   "version": "0.1.0",
   "private": true,
-  "engines": { "node": ">=24" },
+  "engines": {
+    "node": ">=24"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -14,6 +16,7 @@
   },
   "dependencies": {
     "next": "^15.5.3",
+    "next-intl": "^4.14.5",
     "react": "^19.1.1",
     "react-dom": "^19.1.1"
   },
@@ -24,6 +27,7 @@
     "@types/react-dom": "^19.1.9",
     "eslint": "^9.35.0",
     "eslint-config-next": "^15.5.3",
+    "ts-morph": "^28.0.0",
     "tsx": "^4.20.5",
     "typescript": "^5.9.2",
     "vitest": "^3.2.4"

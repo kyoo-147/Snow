@@ -1,9 +1,10 @@
 "use client";
 
-import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { Link, usePathname, useRouter } from "@/i18n/routing";
 import { useEffect, useState } from "react";
 import { fetchJson } from "./api-client";
+import { useTranslations } from "next-intl";
+import { LanguageSwitcher } from "./language-switcher";
 
 type User = {
   id: number;
@@ -23,6 +24,7 @@ export function AdminShell({
   description?: string;
   actions?: React.ReactNode;
 }) {
+  const t = useTranslations("common.adminShell");
   const pathname = usePathname();
   const router = useRouter();
   const [, setUser] = useState<User | null>(null);
@@ -54,9 +56,9 @@ export function AdminShell({
   }
 
   const navItems = [
-    { href: "/admin", label: "Overview" },
-    { href: "/admin/lessons", label: "Lessons" },
-    { href: "/admin/routines", label: "Routines" },
+    { href: "/admin", label: t("navOverview") },
+    { href: "/admin/lessons", label: t("navLessons") },
+    { href: "/admin/routines", label: t("navRoutines") },
   ];
 
   return (
@@ -65,9 +67,9 @@ export function AdminShell({
         <div style={{ display: "flex", alignItems: "center", gap: "20px" }}>
           <Link href="/admin" className="header-brand">
             <span className="brand-dot" style={{ background: "var(--lilac)" }}>AD</span>
-            <span>AgentKid Admin</span>
+            <span>{t("brandText")}</span>
           </Link>
-          <nav className="header-nav" aria-label="Admin navigation">
+          <nav className="header-nav">
             {navItems.map((item) => {
               const isActive = pathname === item.href;
               return (
@@ -85,16 +87,17 @@ export function AdminShell({
         </div>
 
         <div className="header-actions">
+          <LanguageSwitcher />
           <Link href="/parent" className="btn btn-sm btn-lime">
-            Switch to Parent Mode
+            {t("parentPortal")}
           </Link>
           <button
             onClick={handleLogout}
             disabled={loggingOut}
             className="btn btn-sm"
-            aria-label="Log out"
+            aria-label={t("logOut")}
           >
-            {loggingOut ? "Signing out…" : "Log out"}
+            {loggingOut ? t("signingOut") : t("logOut")}
           </button>
         </div>
       </header>
