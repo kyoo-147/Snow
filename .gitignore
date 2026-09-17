@@ -1,3 +1,9 @@
 .pi/
 .commandcode/
 docs/
+.data/
+.next/
+node_modules/
+*.tsbuildinfo
+.env*
+!.env.example

@@ -1,0 +1,4 @@
+import { redirect } from "next/navigation";
+import { AppShell } from "@/components/app-shell";
+import { currentUser } from "@/lib/auth";
+export default async function Admin(){const user=await currentUser();if(!user)redirect("/login");if(user.role!=="admin")redirect("/dashboard");return <AppShell><div className="heading"><p className="eyebrow">Admin</p><h1>Learning content controls.</h1><p>Lesson and routine CRUD endpoints are ready. A later UI lane can build management workflows on this stable foundation.</p></div><section className="grid"><article className="card"><h2>Lessons</h2><p>Create, update, activate, and retire structured lesson content.</p></article><article className="card"><h2>Routines</h2><p>Manage ordered steps for repeatable daily activities.</p></article></section></AppShell>;}

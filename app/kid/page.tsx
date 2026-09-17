@@ -1,0 +1,2 @@
+import { AppShell } from "@/components/app-shell";
+export default function Kid(){return <AppShell><div className="heading"><p className="eyebrow">Kid space</p><h1>Ready for a small step?</h1><p>This placeholder is intentionally simple. The session and child-safe chat APIs are ready for the dedicated UI lane.</p></div><section className="card focus"><h2>Today’s starting point</h2><p>Take a breath, choose one activity, and ask for help whenever you need it.</p><button className="button">Start a session</button></section></AppShell>;}
